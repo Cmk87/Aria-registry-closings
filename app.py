@@ -43,18 +43,20 @@ if login():
         else:
             return None
 
-    # Function to generate Google Maps Street View link
-    def generate_street_view_link(lat, lon):
-        return f"https://www.google.com/maps?q=&layer=c&cbll={lat},{lon}"
+    # Function to generate Google Maps Street View link based on the full address
+    def generate_street_view_link_by_address(street, number):
+        # Generates a Street View link based on the full address, using "Madrid" as the city
+        return f"https://www.google.com/maps/search/{street.replace(' ', '+')}+{number},+Madrid"
 
-    # Function to generate a Google Maps Street View link for the input address
+    # Function to generate a Google Maps search link for the input address
     def generate_input_street_view_link(address):
-        geolocator = Nominatim(user_agent="chris.karpfen@gmail.com")
-        location = geolocator.geocode(address)
-        if location:
-            return f"https://www.google.com/maps?q=&layer=c&cbll={location.latitude},{location.longitude}"
-        else:
-            return None
+        # Use the full address to generate the Google Maps search link
+        return f"https://www.google.com/maps/search/{address.replace(' ', '+')},+Madrid"
+
+    # Function to generate Google Search link (for Idealista search)
+    def generate_google_search_link(street, number):
+        query = f"idealista {street} {number} Madrid"
+        return f"https://www.google.com/search?q={query.replace(' ', '+')}"
 
     # Function to create an Excel file in memory and return it
     def to_excel(df):
@@ -82,9 +84,9 @@ if login():
         nearby_properties['m2'] = nearby_properties['m2'].astype(int)
         nearby_properties['Price'] = nearby_properties['Price'].round(0).astype(int)
         
-        # Generate Street View links
+        # Generate Street View links based on the full address
         nearby_properties['Street View'] = nearby_properties.apply(
-            lambda row: f'<a href="{generate_street_view_link(row["Latitude"], row["Longitud"])}" target="_blank">View</a>', axis=1
+            lambda row: f'<a href="{generate_street_view_link_by_address(row["Street"], row["Nr"])}" target="_blank">View</a>', axis=1
         )
         
         return nearby_properties
@@ -105,9 +107,9 @@ if login():
         street_properties['m2'] = street_properties['m2'].astype(int)
         street_properties['Price'] = street_properties['Price'].round(0).astype(int)
         
-        # Generate Street View links
+        # Generate Street View links based on the full address
         street_properties['Street View'] = street_properties.apply(
-            lambda row: f'<a href="{generate_street_view_link(row["Latitude"], row["Longitud"])}" target="_blank">View</a>', axis=1
+            lambda row: f'<a href="{generate_street_view_link_by_address(row["Street"], row["Nr"])}" target="_blank">View</a>', axis=1
         )
         
         return street_properties
@@ -150,6 +152,7 @@ if login():
         # Geocode the address to get latitude and longitude
         location = geocode_address(address)
         input_street_view_link = generate_input_street_view_link(address)
+        google_search_link = generate_google_search_link(street, number)  # Generate Google search link
 
         if location:
             lat, lon = location
@@ -160,6 +163,9 @@ if login():
             if input_street_view_link:
                 st.markdown(f"**Input Address Street View Link:** [View Street View]({input_street_view_link})")
             
+            # Add clickable link for Google search
+            st.markdown(f"**Idealista building data:** [Search]({google_search_link})")
+
             radius_results = find_properties_within_radius(df, lat, lon, radius, min_size, max_size, num_results)
 
             # Modify the "Date" column header to include the format "yyyy-mm-dd"
