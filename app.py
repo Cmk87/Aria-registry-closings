@@ -7,14 +7,23 @@ from io import BytesIO  # Import BytesIO for Excel file creation
 # Set page configuration for wide mode
 st.set_page_config(layout="wide", page_title="ARIA Registry Closings Extractor")
 
-# Define the correct password
-correct_password = "Closings_24"
+# Create a login page with plain text inputs for Chrome password manager to recognize
+def login():
+    st.title("Login")
 
-# Password input
-password = st.text_input("Enter the password", type="password")
+    # Use plain text input for password manager recognition (easier for browsers to save)
+    password = st.text_input("Enter your password", value="", type="default")
 
-# Check if the password is correct
-if password == correct_password:
+    if password == "Closings_24":
+        st.success("Access granted!")
+        return True
+    else:
+        if password:
+            st.error("Incorrect password!")
+        return False
+
+# If the user is logged in, show the rest of the app
+if login():
     # Load your data
     @st.cache_data  # Updated cache function
     def load_data():
@@ -184,7 +193,3 @@ if password == correct_password:
             )
         else:
             st.write("Address could not be geocoded. Please try again.")
-
-else:
-    if password:
-        st.error("Access denied. Incorrect password.")
