@@ -84,6 +84,9 @@ if login():
         nearby_properties['m2'] = nearby_properties['m2'].astype(int)
         nearby_properties['Price'] = nearby_properties['Price'].round(0).astype(int)
         
+        # Add a new column for Price per square meter (Price psm) without decimals
+        nearby_properties['Price psm'] = (nearby_properties['Price'] / nearby_properties['m2']).round(0).astype(int)
+        
         # Generate Street View links based on the full address
         nearby_properties['Street View'] = nearby_properties.apply(
             lambda row: f'<a href="{generate_street_view_link_by_address(row["Street"], row["Nr"])}" target="_blank">View</a>', axis=1
@@ -106,6 +109,9 @@ if login():
         # Return m2 and Price without decimals
         street_properties['m2'] = street_properties['m2'].astype(int)
         street_properties['Price'] = street_properties['Price'].round(0).astype(int)
+        
+        # Add a new column for Price per square meter (Price psm) without decimals
+        street_properties['Price psm'] = (street_properties['Price'] / street_properties['m2']).round(0).astype(int)
         
         # Generate Street View links based on the full address
         street_properties['Street View'] = street_properties.apply(
@@ -172,7 +178,7 @@ if login():
             radius_results.columns = radius_results.columns.str.replace('Date', 'Date (yyyy-mm-dd)')
 
             # Display the dataframe, removing row numbers and adding clickable street view links
-            st.write(radius_results[['Date (yyyy-mm-dd)', 'Street', 'Nr', 'Price', 'm2', 'Const. Year', 'distance', 'Street View']].to_html(index=False, escape=False), unsafe_allow_html=True)
+            st.write(radius_results[['Date (yyyy-mm-dd)', 'Street', 'Nr', 'Price', 'm2', 'Price psm', 'Const. Year', 'distance', 'Street View']].to_html(index=False, escape=False), unsafe_allow_html=True)
 
             # Button to download to Excel (without resetting the output)
             st.download_button(
@@ -189,7 +195,7 @@ if login():
             street_results.columns = street_results.columns.str.replace('Date', 'Date (yyyy-mm-dd)')
 
             # Display the dataframe, removing row numbers and adding clickable street view links
-            st.write(street_results[['Date (yyyy-mm-dd)', 'Street', 'Nr', 'Price', 'm2', 'Const. Year', 'distance', 'Street View']].to_html(index=False, escape=False), unsafe_allow_html=True)
+            st.write(street_results[['Date (yyyy-mm-dd)', 'Street', 'Nr', 'Price', 'm2', 'Price psm', 'Const. Year', 'distance', 'Street View']].to_html(index=False, escape=False), unsafe_allow_html=True)
 
             # Button to download to Excel (without resetting the output)
             st.download_button(
