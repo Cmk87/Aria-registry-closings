@@ -61,6 +61,7 @@ pyperclip==1.9.0
 PySocks
 python-dateutil
 pytz
+pywin32==307
 PyYAML
 pyzmq
 referencing
@@ -83,6 +84,7 @@ validators
 watchdog
 wcwidth
 widgetsnbextension
+win_inet_pton
 XlsxWriter
 zipp
 zstandard==0.23.0
